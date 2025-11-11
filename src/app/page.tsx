@@ -1,17 +1,14 @@
-import { getTechnologies, getTechnologiesForCourse } from "@/tools/DataManager";
-import { Technology } from "@/tools/data.model";
+import Album from './components/Album';
+import { Photo } from "@/tools/samples.model";
+import { getPhotos } from "@/tools/DataManager";
 
 
-export default async function Home() {
+export default async function  Home() {
 
-  // let technologies:Technology[] = await getTechnologies();
-  let technologiesForCourse:Technology[] = await getTechnologiesForCourse("PROG3017");
-
+  const albumData: Photo[] = await getPhotos();
   return (
-    <pre>
-      {/* {JSON.stringify(technologies, null, "\t")} */}
-      {JSON.stringify(technologiesForCourse, null, "\t")}
-    </pre>
+    <div className="text-blue-400 p-4">
+      <Album albumData={albumData}/>
+    </div>
   );
-  
 }
