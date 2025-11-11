@@ -1,9 +1,17 @@
-export default function Home() {
+import { getTechnologies, getTechnologiesForCourse } from "@/tools/DataManager";
+import { Technology } from "@/tools/data.model";
+
+
+export default async function Home() {
+
+  // let technologies:Technology[] = await getTechnologies();
+  let technologiesForCourse:Technology[] = await getTechnologiesForCourse("PROG3017");
 
   return (
-    <div className="text-blue-400 font-bold text-xl p-4">
-      Hello World!
-    </div>
+    <pre>
+      {/* {JSON.stringify(technologies, null, "\t")} */}
+      {JSON.stringify(technologiesForCourse, null, "\t")}
+    </pre>
   );
   
 }
