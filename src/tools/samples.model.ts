@@ -6,7 +6,7 @@ export interface PhotosData {
 }
 
 export interface Photo {
-    _id: string;
+    id: string;
     title: string;
     caption: string;
     source: string; 
@@ -16,6 +16,7 @@ export interface Photo {
 }
 
 export interface Comment {
+    photoId: string;
     comment: string;
     author: string;
 }
