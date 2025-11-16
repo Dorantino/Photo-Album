@@ -1,6 +1,8 @@
-import { MongoClient, Db, Collection, FindCursor } from "mongodb";
+import { MongoClient, Db, Collection, FindCursor, InsertOneResult, ObjectId, UpdateResult } from "mongodb";
 // import { getJSONData } from "./Toolkit";
 import { Photo } from "./samples.model";
+import sanitizeHtml from "sanitize-html";
+import { NextResponse, NextRequest } from 'next/server';
 
 // MongoDB constants
 const MONGO_URL:string = "mongodb://mongo:27017/";
@@ -39,4 +41,43 @@ export async function getPhotos() {
     }
 
     return albumData;
+}
+
+
+export async function addComments(request: NextRequest){
+    let mongoClient: MongoClient = new MongoClient(MONGO_URL);
+
+    try {
+        await mongoClient.connect();
+
+        // fetch the json from the request
+        const body:any = await request.json();
+
+        // Correct field access
+        const photoId: ObjectId = new ObjectId(sanitizeHtml(body.photoId));
+
+        // Create sanitized comment object
+        const newComment = {
+            author: sanitizeHtml(body.author),
+            comment: sanitizeHtml(body.comment),
+        };
+
+        const photoCollection:Collection<Photo> = mongoClient.db(MONGO_DB_NAME).collection<Photo>(MONGO_COLLECTION_PHOTOS);
+        let selector:Object = {"_id": photoId};
+        let newValues: any = { $push: { comments: newComment } };
+
+        // Push new comment into array & return updated document
+         await photoCollection.updateOne(selector,newValues);
+
+        const result = await photoCollection.find().toArray();
+
+        return NextResponse.json(result, {status:200});
+
+    } catch (error:any){
+        // return new NextResponse(JSON.stringify({error: error.message}), {status:500 });
+        return NextResponse.json({error: error.message}, {status:500 });
+
+    } finally {
+        mongoClient.close();
+    }
 }

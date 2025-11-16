@@ -14,7 +14,7 @@ export default function Comments({ selectedPhoto, setPhotos }: { selectedPhoto: 
     const [showError, setShowError] = useState<boolean>(false);
 
     // API URl for sending the comment
-    const SEND_SCRIPT: string = "http://localhost/addComment.php";
+    const POST_URL:string = "/api/create";
     
     // Event handler for sending comments
     const sendComment = async (e: any) => {
@@ -34,8 +34,12 @@ export default function Comments({ selectedPhoto, setPhotos }: { selectedPhoto: 
 
         setIsLoading(true);
         console.log("Sending comment:", data);
-        let newData = await sendJSONData(SEND_SCRIPT, data);
-        setPhotos(newData.photos);
+        let newData = await sendJSONData(POST_URL, data);
+        console.log(newData)
+        if (newData && newData.data) {
+            setPhotos(newData.data);
+            console.log(newData)
+        }
         setIsLoading(false);
         setAuthor("");
         setComment("");
