@@ -27,7 +27,7 @@ export default function Comments({ selectedPhoto, setPhotos }: { selectedPhoto: 
         
         // Data object that will be sent to the server
         const data: Comment = {
-            "photoId": selectedPhoto.id,
+            "photoId": selectedPhoto._id,
             "author": author,
             "comment": comment
         };
