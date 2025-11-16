@@ -1,14 +1,83 @@
-import { getJSONData } from "./Toolkit";
+import { MongoClient, Db, Collection, FindCursor, InsertOneResult, ObjectId, UpdateResult } from "mongodb";
+// import { getJSONData } from "./Toolkit";
 import { Photo } from "./samples.model";
+import sanitizeHtml from "sanitize-html";
+import { NextResponse, NextRequest } from 'next/server';
+
+// MongoDB constants
+const MONGO_URL:string = "mongodb://mongo:27017/";
+const MONGO_DB_NAME:string = "dbPhotoAlbum";	
+const MONGO_COLLECTION_PHOTOS:string = "photoAlbum";
 
 export async function getPhotos() {
-  // // request url of Web API to retrieve JSON
-  const RETRIEVE_SCRIPT: string = "http://my-api-server/retrieveAlbum.php?count=11";
+    // construct a MongoClient object
+    let mongoClient: MongoClient = new MongoClient(MONGO_URL);
 
-  // fetch the data from the web api
-  const data = await getJSONData(RETRIEVE_SCRIPT, 0, true);
+    let albumData: Photo[];
 
-  const albumData: Photo[] = data.photos;
+    try {
+        // make connection to mongoDB server (ASYNC task)
+        await mongoClient.connect();
+        // get reference to database via name
+        let db:Db = mongoClient.db(MONGO_DB_NAME);
 
-  return albumData;
+        let collection:Collection<Photo> = db.collection<Photo>(MONGO_COLLECTION_PHOTOS);
+        // get all documents in the collection
+        
+        let cursor:FindCursor = collection.find();
+
+        // get an array of all the documents from the cursor
+        albumData = await cursor.toArray();
+        // need convert each ObjectID to a string
+        albumData.forEach((photoData:Photo) => photoData._id = photoData._id.toString());
+
+        console.log(albumData)
+
+    } catch (error:any) {
+        console.log(`>>> DB ERROR : ${error.message}`);
+        throw error;
+    } finally {
+        mongoClient.close();
+    }
+
+    return albumData;
+}
+
+
+export async function addComments(request: NextRequest){
+    let mongoClient: MongoClient = new MongoClient(MONGO_URL);
+
+    try {
+        await mongoClient.connect();
+
+        // fetch the json from the request
+        const body:any = await request.json();
+
+        // Correct field access
+        const photoId: ObjectId = new ObjectId(sanitizeHtml(body.photoId));
+
+        // Create sanitized comment object
+        const newComment = {
+            author: sanitizeHtml(body.author),
+            comment: sanitizeHtml(body.comment),
+        };
+
+        const photoCollection:Collection<Photo> = mongoClient.db(MONGO_DB_NAME).collection<Photo>(MONGO_COLLECTION_PHOTOS);
+        let selector:Object = {"_id": photoId};
+        let newValues: any = { $push: { comments: newComment } };
+
+        // Push new comment into array & return updated document
+         await photoCollection.updateOne(selector,newValues);
+
+        const result = await photoCollection.find().toArray();
+
+        return NextResponse.json(result, {status:200});
+
+    } catch (error:any){
+        // return new NextResponse(JSON.stringify({error: error.message}), {status:500 });
+        return NextResponse.json({error: error.message}, {status:500 });
+
+    } finally {
+        mongoClient.close();
+    }
 }

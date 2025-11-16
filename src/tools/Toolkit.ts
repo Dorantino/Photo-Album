@@ -89,8 +89,10 @@ export async function sendJSONData(sendURL: string, sendJSON: any, debug: boolea
             body: JSON.stringify(sendJSON),
             cache: 'no-store'
         });
-        const data:any = await response.json();
-        return data;
+        // Check if the response status indicates an error - manually throw error since fetch only throws error for network issues
+        if (!response.ok) throw new Error();
+        const responseData:any = await response.json();
+        return {data:responseData, status: response.status};
     } catch (error:any) {
         console.log(`>>> FETCH ERROR: ${error.message}`);
         if (debug) throw error;
