@@ -8,7 +8,7 @@ export default function Jumpto({ albumData, onJumpToPhoto, selectedIndex }: { al
             {/* Container for all thumbnails */}
             <div className="flex flex-row flex-wrap gap-2 ">
                 {albumData.map((photo, index) => (
-                    <div key={photo.id} onClick={() => onJumpToPhoto(index)} className={`cursor-pointer rounded-lg  `}>
+                    <div key={photo._id} onClick={() => onJumpToPhoto(index)} className={`cursor-pointer rounded-lg  `}>
                         <Image
                             src={`/images/photos/${photo.source}`}
                             alt={photo.title}
