@@ -32,17 +32,26 @@ export default function Comments({ selectedPhoto, setPhotos }: { selectedPhoto: 
             "comment": comment
         };
 
-        setIsLoading(true);
-        console.log("Sending comment:", data);
-        let newData = await sendJSONData(POST_URL, data);
-        console.log(newData)
-        if (newData && newData.data) {
-            setPhotos(newData.data);
-            console.log(newData)
+        try {
+            const result = await sendJSONData(POST_URL, data, false);
+
+            if (!result || !result.data) {
+                console.warn("No data returned!");
+                return;
+            }
+
+            // This gives you the fresh DB photos array
+            setPhotos(result.data);
+
+            // Reset form values
+            setAuthor("");
+            setComment("");
+
+        } catch (err) {
+            console.error("sendComment error:", err);
+        } finally {
+            setIsLoading(false);
         }
-        setIsLoading(false);
-        setAuthor("");
-        setComment("");
     };
 
     return (
