@@ -79,12 +79,7 @@ export async function addComments(request: NextRequest) {
 
         const result = await photoCollection.find().toArray();
 
-        // Sort comments in each photo
-        // result.forEach((photo: any) => {
-        //     if (photo.comments) {
-        //         photo.comments.reverse(); 
-        //     }
-        // });
+        result.forEach((photoData: Photo) => photoData._id = photoData._id.toString());
 
         return NextResponse.json(result, { status: 200 });
 

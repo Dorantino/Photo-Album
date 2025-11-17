@@ -22,8 +22,10 @@ export default function Comments({ selectedPhoto, setPhotos }: { selectedPhoto: 
         if (author.trim() === "" || comment.trim() === "") {
         setShowError(true);
         return; 
-        } 
+        }
+
         setShowError(false);
+        setIsLoading(true);
         
         // Data object that will be sent to the server
         const data: Comment = {
