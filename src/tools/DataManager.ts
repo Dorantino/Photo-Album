@@ -30,7 +30,6 @@ export async function getPhotos() {
         // need convert each ObjectID to a string
         albumData.forEach((photoData: Photo) => photoData._id = photoData._id.toString());
 
-        console.log(albumData)
 
     } catch (error: any) {
         console.log(`>>> DB ERROR : ${error.message}`);
