@@ -1,5 +1,4 @@
 import { MongoClient, Db, Collection, FindCursor, InsertOneResult, ObjectId, UpdateResult } from "mongodb";
-// import { getJSONData } from "./Toolkit";
 import { Photo } from "./samples.model";
 import sanitizeHtml from "sanitize-html";
 import { NextResponse, NextRequest } from 'next/server';
@@ -65,9 +64,13 @@ export async function addComments(request: NextRequest) {
 
         const photoCollection: Collection<Photo> = mongoClient.db(MONGO_DB_NAME).collection<Photo>(MONGO_COLLECTION_PHOTOS);
         let selector: Object = { "_id": photoId };
-        let newValues: any = {$push: {comments: {
+        let newValues: any = {
+            $push: {
+                comments: {
                     $each: [newComment],
-                    $sort: { createdAt: -1 }}}
+                    $sort: { createdAt: -1 }
+                }
+            }
         };
 
         // Push new comment into array
