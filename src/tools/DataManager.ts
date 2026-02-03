@@ -1,4 +1,4 @@
-import { MongoClient, Db, Collection, FindCursor, InsertOneResult, ObjectId, UpdateResult } from "mongodb";
+import { MongoClient, Db, Collection, FindCursor, ObjectId } from "mongodb";
 import { Photo } from "./samples.model";
 import sanitizeHtml from "sanitize-html";
 import { NextResponse, NextRequest } from 'next/server';
